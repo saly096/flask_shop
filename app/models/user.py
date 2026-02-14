@@ -17,6 +17,7 @@ class User(db.Model):
     is_admin = db.Column(db.Boolean, default=False)
     is_active = db.Column(db.Boolean, default=True)
     avatar_url = db.Column(db.String(500))
+    referrer_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     last_login = db.Column(db.DateTime)
@@ -25,6 +26,7 @@ class User(db.Model):
     orders = db.relationship('Order', backref='user', lazy='dynamic', cascade='all, delete-orphan')
     cart_items = db.relationship('CartItem', backref='user', lazy='dynamic', cascade='all, delete-orphan')
     reviews = db.relationship('Review', backref='user', lazy='dynamic', cascade='all, delete-orphan')
+    referrer = db.relationship('User', remote_side=[id], backref='referrals', lazy='dynamic')
     
     def set_password(self, password):
         """设置密码"""
@@ -50,6 +52,7 @@ class User(db.Model):
             'is_admin': self.is_admin,
             'is_active': self.is_active,
             'avatar_url': self.avatar_url,
+            'referrer_id': self.referrer_id,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'last_login': self.last_login.isoformat() if self.last_login else None
         }
